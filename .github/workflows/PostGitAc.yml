@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '*/30 * * * *'  # Runs every 30 minutes
 
+permissions:
+  contents: read
+  checks: write  # Required for test-reporter to publish test results
+
 jobs:
   automated-api-tests:
     runs-on: ubuntu-latest
@@ -45,7 +49,6 @@ jobs:
           name: Postman API Test Report
           path: report/report.xml
           reporter: java-junit
-
 
       - name: Logout from Postman CLI
         run: postman logout
