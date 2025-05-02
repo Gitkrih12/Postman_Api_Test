@@ -3,6 +3,8 @@ name: Automated API tests using Postman CLI
 on: 
   workflow_dispatch:
   push:
+  schedule:
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
 
 jobs:
   automated-api-tests:
@@ -19,6 +21,7 @@ jobs:
 
       - name: Run API tests and generate reports
         run: |
+          mkdir -p report
           postman collection run "39923645-324519ea-8300-416a-b18b-9d0461012063" \
             --reporters cli,junit,html \
             --reporter-junit-export="report/report.xml" \
@@ -30,11 +33,18 @@ jobs:
           name: postman-html-report
           path: report/report.html
 
-      - name: Upload JUnit report for GitHub Actions Test Summary
+      - name: Upload JUnit report as artifact
         uses: actions/upload-artifact@v4
         with:
           name: postman-junit-report
           path: report/report.xml
+
+      - name: Publish JUnit report to GitHub Test Summary
+        uses: dorny/test-reporter@v1
+        with:
+          name: Postman API Test Report
+          path: report/report.xml
+          reporter: junit
 
       - name: Logout from Postman CLI
         run: postman logout
