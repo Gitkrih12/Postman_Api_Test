@@ -3,8 +3,8 @@ name: Automated API tests using Postman CLI
 on: 
   workflow_dispatch:
   push:
-  #schedule:
-   # - cron: '*/30 * * * *'  # Runs every 30 minutes
+  schedule:
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
 
 permissions:
   contents: read
@@ -49,6 +49,24 @@ jobs:
           name: Postman API Test Report
           path: report/report.xml
           reporter: java-junit
+      - name: Email Postman Test Summary
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Postman API Test Report - ${{ env.ENV }} - ${{ github.run_number }}
+          to: ${{ secrets.EMAIL_RECIPIENTS }}
+          from: ${{ secrets.EMAIL_FROM || secrets.EMAIL_USERNAME }}
+          secure: true
+          html_body: |
+            <p>Hi Team,</p>
+            <p>The latest <strong>Postman API test run</strong> has completed for the <strong>${{ env.ENV }}</strong> environment.</p>
+            <p>Click below to download the HTML report:</p>
+            <p><a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">View Report in GitHub</a></p>
+            <p>Regards,<br>Automation Team</p>
+
 
       - name: Logout from Postman CLI
         run: postman logout
