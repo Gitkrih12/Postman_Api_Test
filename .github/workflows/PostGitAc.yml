@@ -3,8 +3,8 @@ name: Automated API tests using Postman CLI
 on: 
   workflow_dispatch:
   push:
-  schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
+#  schedule:
+ #   - cron: '*/30 * * * *'  # Runs every 30 minutes
 
 permissions:
   contents: read
